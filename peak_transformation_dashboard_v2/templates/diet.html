@@ -1,0 +1,941 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+  <title>Diet | Abishek</title>
+
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800;900&display=swap"
+    rel="stylesheet"
+  >
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'DM Sans', sans-serif;
+      background:
+        radial-gradient(
+          circle at 5% 0%,
+          rgba(249, 115, 22, .10),
+          transparent 25%
+        ),
+        radial-gradient(
+          circle at 95% 15%,
+          rgba(34, 197, 94, .08),
+          transparent 25%
+        ),
+        #f5f7fb;
+      color: #172033;
+    }
+
+    .nav {
+      background: rgba(255,255,255,.96);
+      border-bottom: 1px solid #e5e7eb;
+      backdrop-filter: blur(12px);
+    }
+
+    .nav a {
+      color: #64748b;
+      transition: all .2s ease;
+    }
+
+    .nav a:hover,
+    .nav a.active {
+      color: #ea580c;
+      background: #fff7ed;
+    }
+
+    .hero {
+      background:
+        radial-gradient(
+          circle at 90% 10%,
+          rgba(249,115,22,.12),
+          transparent 30%
+        ),
+        linear-gradient(
+          135deg,
+          #ffffff 0%,
+          #fffaf5 55%,
+          #f8fafc 100%
+        );
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .card {
+      background: rgba(255,255,255,.97);
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 10px 35px rgba(15,23,42,.07);
+      transition: all .25s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 18px 45px rgba(15,23,42,.12);
+    }
+
+    .orange {
+      color: #ea580c;
+    }
+
+    .green {
+      color: #16a34a;
+    }
+
+    .blue {
+      color: #2563eb;
+    }
+
+    .purple {
+      color: #9333ea;
+    }
+
+    .metric-number {
+      font-size: 30px;
+      line-height: 1.1;
+      font-weight: 900;
+    }
+
+    .meal-image-wrap {
+      height: 240px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .meal-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform .55s ease;
+    }
+
+    .card:hover .meal-image {
+      transform: scale(1.06);
+    }
+
+    .image-overlay {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(
+          to top,
+          rgba(0,0,0,.72),
+          rgba(0,0,0,.08) 65%,
+          transparent
+        );
+    }
+
+    .meal-title {
+      position: absolute;
+      left: 22px;
+      bottom: 18px;
+      color: white;
+      font-size: 25px;
+      line-height: 1;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      text-shadow: 0 2px 8px rgba(0,0,0,.4);
+    }
+
+    .meal-subtitle {
+      position: absolute;
+      left: 22px;
+      bottom: 47px;
+      color: #fed7aa;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .food-row {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      transition: all .2s ease;
+    }
+
+    .food-row:hover {
+      background: #fff7ed;
+      border-color: #fed7aa;
+      transform: translateX(2px);
+    }
+
+    .food-name {
+      color: #334155;
+    }
+
+    .food-amount {
+      color: #ea580c;
+      white-space: nowrap;
+      font-weight: 800;
+    }
+
+    .added-food {
+      color: #dc2626;
+      font-weight: 800;
+    }
+
+    .protein-box {
+      background: linear-gradient(135deg,#f0fdf4,#ffffff);
+      border: 1px solid #bbf7d0;
+    }
+
+    .fiber-box {
+      background: linear-gradient(135deg,#eff6ff,#ffffff);
+      border: 1px solid #bfdbfe;
+    }
+
+    .recovery-box {
+      background: linear-gradient(135deg,#faf5ff,#ffffff);
+      border: 1px solid #e9d5ff;
+    }
+
+    .rule-box {
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+    }
+
+    .note-box {
+      background: linear-gradient(135deg,#fffbeb,#fff);
+      border: 1px solid #fde68a;
+    }
+
+    .progress-track {
+      height: 9px;
+      background: #e5e7eb;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 85%;
+      background: linear-gradient(
+        90deg,
+        #f97316,
+        #fb923c
+      );
+      border-radius: 999px;
+    }
+
+    input[type="number"],
+    input[type="text"] {
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      background: #f8fafc;
+      padding: 12px 14px;
+      font-size: 14px;
+      font-family: inherit;
+      color: #172033;
+      outline: none;
+      transition: .2s;
+    }
+
+    input:focus {
+      background: white;
+      border-color: #fb923c;
+      box-shadow: 0 0 0 3px rgba(249, 115, 22, .12);
+    }
+
+    .save-btn {
+      border: 0;
+      border-radius: 12px;
+      height: 44px;
+      background: linear-gradient(135deg, #f97316, #ea580c);
+      color: white;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(234, 88, 12, .25);
+      transition: .2s;
+    }
+
+    .save-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 24px rgba(234, 88, 12, .32);
+    }
+
+    @media(max-width:700px) {
+      .meal-image-wrap {
+        height: 210px;
+      }
+
+      .meal-title {
+        font-size: 22px;
+      }
+    }
+  </style>
+</head>
+
+
+<body>
+
+
+<!-- =========================================================
+     NAVIGATION
+========================================================= -->
+
+<nav class="nav sticky top-0 z-50">
+
+  <div class="max-w-7xl mx-auto px-4 py-3">
+
+    <div class="flex gap-2 overflow-x-auto">
+
+      <a
+        href="/"
+        class="rounded-xl px-4 py-2 whitespace-nowrap"
+      >
+        📊 Dashboard
+      </a>
+
+      <a
+        href="/workout"
+        class="rounded-xl px-4 py-2 whitespace-nowrap"
+      >
+        🏋️ Workout
+      </a>
+
+      <a
+        href="/diet"
+        class="active rounded-xl px-4 py-2 whitespace-nowrap"
+      >
+        🥗 Diet
+      </a>
+
+      <a
+        href="/progress"
+        class="rounded-xl px-4 py-2 whitespace-nowrap"
+      >
+        📈 Progress
+      </a>
+
+    </div>
+
+  </div>
+
+</nav>
+
+
+<!-- =========================================================
+     HERO
+========================================================= -->
+
+<header class="hero">
+
+  <div class="max-w-7xl mx-auto px-4 py-10">
+
+    <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-7">
+
+      <div>
+
+        <p class="orange text-sm font-black tracking-widest">
+          LEAN MUSCLE • FAT LOSS
+        </p>
+
+        <h1 class="text-4xl md:text-5xl font-black text-gray-900 mt-2">
+          YOUR DAILY DIET
+        </h1>
+
+        <p class="text-gray-500 mt-3 max-w-2xl leading-relaxed">
+          High protein, quality carbohydrates, vegetables, healthy fats
+          and enough fiber to support training, recovery and sustainable
+          fat loss.
+        </p>
+
+      </div>
+
+
+      <div class="bg-white border border-orange-100 rounded-2xl p-5 shadow-sm min-w-[230px]">
+
+        <p class="text-xs text-gray-400 font-black tracking-wider">
+          DAILY PRIORITY
+        </p>
+
+        <p class="text-2xl font-black orange mt-1">
+          PROTEIN + FIBER
+        </p>
+
+        <p class="text-xs text-gray-500 mt-1">
+          Consistency over perfection
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</header>
+
+
+<main class="max-w-7xl mx-auto px-4 py-8">
+
+
+<!-- =========================================================
+     METRIC CARDS
+========================================================= -->
+
+<section class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
+  <!-- WEIGHT -->
+
+  <div class="card rounded-2xl p-5">
+
+    <p class="text-xs text-gray-400 font-black uppercase">
+      Current Weight
+    </p>
+
+    <p class="metric-number orange mt-2">
+      {{ current_weight }} kg
+    </p>
+
+    <p class="text-xs text-gray-400 mt-2">
+      Current body weight
+    </p>
+
+  </div>
+
+
+  <!-- CALORIES -->
+
+  <div class="card rounded-2xl p-5">
+
+    <p class="text-xs text-gray-400 font-black uppercase">
+      Estimated Calories
+    </p>
+
+    <p class="metric-number orange mt-2">
+      {{ calories }}
+    </p>
+
+    <p class="text-xs text-gray-400 mt-2">
+      kcal / day
+    </p>
+
+  </div>
+
+
+  <!-- PROTEIN -->
+
+  <div class="card rounded-2xl p-5">
+
+    <p class="text-xs text-gray-400 font-black uppercase">
+      Protein Target
+    </p>
+
+    <p class="metric-number green mt-2">
+      130–150g
+    </p>
+
+    <p class="text-xs text-gray-400 mt-2">
+      Daily target
+    </p>
+
+  </div>
+
+
+  <!-- WEIGHT LOSS -->
+
+  <div class="card rounded-2xl p-5">
+
+    <p class="text-xs text-gray-400 font-black uppercase">
+      Estimated Loss
+    </p>
+
+    <p class="metric-number blue mt-2">
+      {{ weekly_loss }}
+    </p>
+
+    <p class="text-xs text-gray-400 mt-2">
+      kg / week
+    </p>
+
+  </div>
+
+</section>
+
+
+<!-- =========================================================
+     PROTEIN TARGET BAR
+========================================================= -->
+
+<section class="card rounded-2xl p-5 mt-5">
+
+  <div class="flex justify-between items-center gap-4">
+
+    <div>
+
+      <p class="text-sm font-black text-gray-900">
+        🥩 Daily Protein Target
+      </p>
+
+      <p class="text-xs text-gray-400 mt-1">
+        Spread protein across your meals.
+      </p>
+
+    </div>
+
+    <strong class="orange">
+      130–150g
+    </strong>
+
+  </div>
+
+  <div class="progress-track mt-4">
+    <div class="progress-fill"></div>
+  </div>
+
+</section>
+
+
+<!-- =========================================================
+     MEAL NUTRITION SUMMARY
+========================================================= -->
+
+<section class="card rounded-3xl p-6 mt-5">
+
+  <div class="flex justify-between items-center mb-4">
+    <div>
+      <h2 class="font-black text-xl text-gray-900">Meal Nutrition Summary</h2>
+      <p class="text-xs text-gray-400 mt-1">Planned calories and macros by meal</p>
+    </div>
+    <span class="rounded-full px-3 py-1 text-xs font-bold bg-green-100 text-green-700">PLAN</span>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="text-left text-xs text-gray-400 font-black uppercase">
+          <th class="py-2">Meal</th><th>Calories</th><th>Protein</th><th>Carbs</th><th>Fat</th><th>Fiber</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for meal, totals in diet_meal_totals.items() %}
+        <tr class="border-t border-gray-100">
+          <td class="py-3 font-black text-gray-700">{{ meal }}</td>
+          <td>{{ totals.calories }}</td><td>{{ totals.protein }}g</td><td>{{ totals.carbs }}g</td>
+          <td>{{ totals.fat }}g</td><td>{{ totals.fiber }}g</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="mt-5 rounded-2xl border border-red-200 bg-red-50 p-4">
+    <div class="flex justify-between items-center mb-3">
+      <div>
+        <h3 class="font-black text-red-700">Added Food Today</h3>
+        <p class="text-xs text-red-500 mt-1">Calculated from Food Tracker entries</p>
+      </div>
+      <span class="text-xs font-black text-red-600">LOGGED</span>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-3 text-sm">
+      <div><p class="text-xs text-red-500">Calories</p><p class="font-black text-red-700">{{ added_food_totals.calories }} kcal</p></div>
+      <div><p class="text-xs text-red-500">Protein</p><p class="font-black text-red-700">{{ added_food_totals.protein }}g</p></div>
+      <div><p class="text-xs text-red-500">Carbs</p><p class="font-black text-red-700">{{ added_food_totals.carbs }}g</p></div>
+      <div><p class="text-xs text-red-500">Fat</p><p class="font-black text-red-700">{{ added_food_totals.fat }}g</p></div>
+      <div><p class="text-xs text-red-500">Fiber</p><p class="font-black text-red-700">{{ added_food_totals.fiber }}g</p></div>
+    </div>
+  </div>
+
+</section>
+
+
+<!-- =========================================================
+     FOOD TRACKER
+========================================================= -->
+
+<section class="card rounded-3xl p-6 mt-5">
+
+  <div class="flex justify-between items-center mb-4">
+    <div>
+      <h2 class="font-black text-xl text-gray-900">🍽️ Food Tracker</h2>
+      <p class="text-xs text-gray-400 mt-1">Enter food and grams — calories and macros are calculated automatically</p>
+    </div>
+    <span class="rounded-full px-3 py-1 text-xs font-bold bg-orange-100 text-orange-700" id="foodDateBadge"></span>
+  </div>
+
+  <form id="foodForm" class="grid grid-cols-3 gap-3 mb-4">
+    <input id="foodName" type="text" placeholder="e.g. chicken breast" class="col-span-2" required>
+    <input id="foodGrams" type="number" placeholder="Grams" min="0.1" step="0.1" required>
+    <button type="submit" class="save-btn col-span-3">Add Food</button>
+  </form>
+
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="text-left text-xs text-gray-400 font-black uppercase">
+          <th class="py-2">Food</th><th>Grams</th><th>Cal</th><th>Protein</th><th>Carbs</th><th>Fat</th><th>Fiber</th><th></th>
+        </tr>
+      </thead>
+      <tbody id="foodLogBody"></tbody>
+      <tfoot>
+        <tr class="font-black text-gray-900 border-t border-gray-200" id="foodLogTotals">
+          <td class="py-2">Total</td><td>0g</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+</section>
+
+
+<!-- =========================================================
+     MEAL CARDS
+========================================================= -->
+
+<section class="grid md:grid-cols-2 gap-6 mt-7">
+
+{% for meal, items in diet_groups.items() %}
+
+<article class="card rounded-3xl overflow-hidden">
+
+
+  <!-- MEAL IMAGE -->
+
+  <div class="meal-image-wrap">
+
+    <img
+      src="{{ diet_images['Evening Snack' if meal == 'Evening' else meal] }}"
+      alt="{{ meal }} healthy meal"
+      class="meal-image"
+      loading="lazy"
+      onerror="this.src='https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=1400&q=90'"
+    >
+
+    <div class="image-overlay"></div>
+
+
+    <div class="meal-subtitle">
+      DAILY NUTRITION
+    </div>
+
+    <div class="meal-title">
+      {{ 'Evening Snack' if meal == 'Evening' else meal }}
+    </div>
+
+  </div>
+
+
+  <!-- FOOD CONTENT -->
+
+  <div class="p-6">
+
+    {% for food, portion in items %}
+
+    <div class="food-row rounded-xl px-4 py-3 mb-2">
+
+      <div class="flex justify-between items-center gap-4">
+
+        <span class="food-name text-sm">
+          {{ food }}
+        </span>
+
+        <span class="food-amount text-sm">
+          {{ portion }}
+        </span>
+
+      </div>
+
+    </div>
+
+    {% endfor %}
+
+    {% set meal_totals = diet_meal_totals.get(meal, {}) %}
+    <div class="mt-4 rounded-xl bg-orange-50 border border-orange-100 px-4 py-3">
+      <p class="text-xs font-black text-orange-700 uppercase">Meal nutrition</p>
+      <p class="text-sm font-bold text-gray-700 mt-1">
+        {{ meal_totals.get('calories', 0) }} kcal ·
+        {{ meal_totals.get('protein', 0) }}g protein ·
+        {{ meal_totals.get('carbs', 0) }}g carbs ·
+        {{ meal_totals.get('fat', 0) }}g fat ·
+        {{ meal_totals.get('fiber', 0) }}g fiber
+      </p>
+    </div>
+
+  </div>
+
+</article>
+
+{% endfor %}
+
+</section>
+
+
+<!-- =========================================================
+     NUTRITION STRATEGY
+========================================================= -->
+
+<section class="card rounded-3xl p-6 mt-8">
+
+  <div>
+
+    <p class="orange text-xs font-black tracking-widest">
+      NUTRITION STRATEGY
+    </p>
+
+    <h2 class="text-2xl md:text-3xl font-black text-gray-900 mt-1">
+      Corrections for a Lean-Muscular Goal
+    </h2>
+
+    <p class="text-gray-500 text-sm mt-2">
+      The goal is not to eat as little as possible.
+      The goal is to lose fat while preserving strength and muscle.
+    </p>
+
+  </div>
+
+
+  <div class="grid md:grid-cols-3 gap-4 mt-6">
+
+
+    <!-- PROTEIN -->
+
+    <div class="protein-box rounded-2xl p-5">
+
+      <div class="text-3xl">
+        🥩
+      </div>
+
+      <h3 class="font-black text-lg text-gray-900 mt-3">
+        More Protein
+      </h3>
+
+      <p class="text-sm text-gray-600 mt-2 leading-relaxed">
+        Whey, eggs, soya, curd, milk and chicken help distribute
+        protein throughout the day and support muscle retention.
+      </p>
+
+    </div>
+
+
+    <!-- FIBER -->
+
+    <div class="fiber-box rounded-2xl p-5">
+
+      <div class="text-3xl">
+        🥦
+      </div>
+
+      <h3 class="font-black text-lg text-gray-900 mt-3">
+        More Fiber
+      </h3>
+
+      <p class="text-sm text-gray-600 mt-2 leading-relaxed">
+        Vegetables, oats, fruit and chia provide fiber and help
+        make a calorie-controlled diet easier to maintain.
+      </p>
+
+    </div>
+
+
+    <!-- RECOVERY -->
+
+    <div class="recovery-box rounded-2xl p-5">
+
+      <div class="text-3xl">
+        🥛
+      </div>
+
+      <h3 class="font-black text-lg text-gray-900 mt-3">
+        Better Recovery
+      </h3>
+
+      <p class="text-sm text-gray-600 mt-2 leading-relaxed">
+        Curd and milk provide convenient protein and nutrients
+        while keeping the overall plan practical.
+      </p>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- =========================================================
+     DAILY RULES
+========================================================= -->
+
+<section class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+
+
+  <div class="rule-box rounded-2xl p-5">
+
+    <span class="orange font-black text-xl">
+      01
+    </span>
+
+    <h3 class="font-black text-gray-900 mt-3">
+      Hydrate
+    </h3>
+
+    <p class="text-sm text-gray-600 mt-1">
+      Keep water intake consistent throughout the day.
+    </p>
+
+  </div>
+
+
+  <div class="rule-box rounded-2xl p-5">
+
+    <span class="orange font-black text-xl">
+      02
+    </span>
+
+    <h3 class="font-black text-gray-900 mt-3">
+      Hit Protein
+    </h3>
+
+    <p class="text-sm text-gray-600 mt-1">
+      Make your daily protein target a priority.
+    </p>
+
+  </div>
+
+
+  <div class="rule-box rounded-2xl p-5">
+
+    <span class="orange font-black text-xl">
+      03
+    </span>
+
+    <h3 class="font-black text-gray-900 mt-3">
+      Control Portions
+    </h3>
+
+    <p class="text-sm text-gray-600 mt-1">
+      Adjust portions using your longer-term weight trend.
+    </p>
+
+  </div>
+
+
+  <div class="rule-box rounded-2xl p-5">
+
+    <span class="orange font-black text-xl">
+      04
+    </span>
+
+    <h3 class="font-black text-gray-900 mt-3">
+      Stay Consistent
+    </h3>
+
+    <p class="text-sm text-gray-600 mt-1">
+      A sustainable diet beats a perfect diet for a few days.
+    </p>
+
+  </div>
+
+
+</section>
+
+
+<!-- =========================================================
+     IMPORTANT NOTE
+========================================================= -->
+
+<section class="note-box rounded-2xl p-5 mt-6">
+
+  <div class="flex gap-4 items-start">
+
+    <div class="text-3xl">
+      💡
+    </div>
+
+    <div>
+
+      <h3 class="font-black text-gray-900">
+        Remember
+      </h3>
+
+      <p class="text-sm text-gray-600 mt-1 leading-relaxed">
+        Rice at dinner is okay. Total daily calories, protein intake
+        and your longer-term weight trend matter more than avoiding
+        carbohydrates at night.
+      </p>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- =========================================================
+     FOOTER
+========================================================= -->
+
+<footer class="text-center py-8">
+
+  <p class="text-xs text-gray-400">
+    PEAK TRANSFORMATION • NUTRITION • CONSISTENCY • RECOVERY
+  </p>
+
+</footer>
+
+
+</main>
+
+<script>
+  const todayISO = new Date().toISOString().slice(0, 10);
+  document.getElementById("foodDateBadge").textContent = todayISO;
+
+  async function loadFoodLog() {
+    const res = await fetch(`/api/food-log?date=${todayISO}`);
+    const data = await res.json();
+    const body = document.getElementById("foodLogBody");
+    body.innerHTML = "";
+    data.items.forEach(item => {
+      const tr = document.createElement("tr");
+      tr.className = "food-row added-food";
+      tr.innerHTML = `<td class="py-2">${item.food_name}</td><td>${item.grams}g</td><td>${item.calories}</td>
+        <td>${item.protein}g</td><td>${item.carbs}g</td><td>${item.fat}g</td><td>${item.fiber}g</td>
+        <td><button data-id="${item.id}" class="delFood text-red-500 text-xs font-bold">✕</button></td>`;
+      body.appendChild(tr);
+    });
+    const t = data.totals;
+    document.getElementById("foodLogTotals").innerHTML =
+      `<td class="py-2">Total</td><td>-</td><td>${t.calories}</td><td>${t.protein}g</td><td>${t.carbs}g</td><td>${t.fat}g</td><td>${t.fiber}g</td><td></td>`;
+
+    document.querySelectorAll(".delFood").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        await fetch(`/api/food-log/${btn.dataset.id}`, { method: "DELETE" });
+        loadFoodLog();
+      });
+    });
+  }
+
+  document.getElementById("foodForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const food_name = document.getElementById("foodName").value.trim();
+    const grams = parseFloat(document.getElementById("foodGrams").value);
+    if (!food_name || !grams) return;
+    const res = await fetch("/api/food-log", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ food_name, grams, log_date: todayISO })
+    });
+    if (!res.ok) {
+      const error = await res.json();
+      alert(error.error || "Unable to add food");
+      return;
+    }
+    document.getElementById("foodForm").reset();
+    loadFoodLog();
+  });
+
+  loadFoodLog();
+</script>
+
+</body>
+</html>

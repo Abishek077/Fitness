@@ -1,0 +1,956 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+  <title>Progress | Peak Transformation</title>
+
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800;900&display=swap"
+    rel="stylesheet"
+  >
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'DM Sans', sans-serif;
+      background:
+        radial-gradient(
+          circle at 5% 0%,
+          rgba(249, 115, 22, .10),
+          transparent 25%
+        ),
+        radial-gradient(
+          circle at 95% 15%,
+          rgba(34, 197, 94, .08),
+          transparent 25%
+        ),
+        #f5f7fb;
+      color: #172033;
+    }
+
+    .nav {
+      background: rgba(255,255,255,.96);
+      border-bottom: 1px solid #e5e7eb;
+      backdrop-filter: blur(12px);
+    }
+
+    .nav a {
+      color: #64748b;
+      transition: all .2s ease;
+    }
+
+    .nav a:hover,
+    .nav a.active {
+      color: #ea580c;
+      background: #fff7ed;
+    }
+
+    .hero {
+      background:
+        radial-gradient(
+          circle at 90% 10%,
+          rgba(249,115,22,.12),
+          transparent 30%
+        ),
+        linear-gradient(
+          135deg,
+          #ffffff 0%,
+          #fffaf5 55%,
+          #f8fafc 100%
+        );
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .card {
+      background: rgba(255,255,255,.97);
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 10px 35px rgba(15,23,42,.07);
+      transition: all .25s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 18px 45px rgba(15,23,42,.12);
+    }
+
+    .orange {
+      color: #ea580c;
+    }
+
+    .green {
+      color: #16a34a;
+    }
+
+    .blue {
+      color: #2563eb;
+    }
+
+    .purple {
+      color: #9333ea;
+    }
+
+    .metric-number {
+      font-size: 30px;
+      line-height: 1.1;
+      font-weight: 900;
+    }
+
+    .progress-track {
+      height: 12px;
+      background: #e5e7eb;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #f97316, #fb923c);
+      border-radius: 999px;
+      transition: width .5s ease;
+    }
+
+    .chart-box {
+      height: 380px;
+      padding: 16px;
+    }
+
+    .chart-box.medium {
+      height: 300px;
+    }
+
+    .chart-box canvas {
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    .insight-box {
+      background: linear-gradient(135deg, #eff6ff, #fff);
+      border: 1px solid #bfdbfe;
+    }
+
+    .note-box {
+      background: linear-gradient(135deg, #fffbeb, #fff);
+      border: 1px solid #fde68a;
+    }
+
+    .score-filter-btn {
+      transition: .2s ease;
+    }
+
+    @media (max-width: 700px) {
+      .chart-box {
+        height: 280px;
+      }
+
+      .chart-box.medium {
+        height: 250px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- =========================================================
+     NAVIGATION
+========================================================= -->
+
+<nav class="nav sticky top-0 z-50">
+
+  <div class="max-w-7xl mx-auto px-4 py-3">
+
+    <div class="flex gap-2 overflow-x-auto">
+
+      <a
+        href="/"
+        class="rounded-xl px-4 py-2 whitespace-nowrap"
+      >
+        📊 Dashboard
+      </a>
+
+      <a
+        href="/workout"
+        class="rounded-xl px-4 py-2 whitespace-nowrap"
+      >
+        🏋️ Workout
+      </a>
+
+      <a
+        href="/diet"
+        class="rounded-xl px-4 py-2 whitespace-nowrap"
+      >
+        🥗 Diet
+      </a>
+
+      <a
+        href="/progress"
+        class="active rounded-xl px-4 py-2 whitespace-nowrap"
+      >
+        📈 Progress
+      </a>
+
+    </div>
+
+  </div>
+
+</nav>
+
+
+<!-- =========================================================
+     HERO
+========================================================= -->
+
+<header class="hero">
+
+  <div class="max-w-7xl mx-auto px-4 py-10">
+
+    <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-7">
+
+      <div>
+
+        <p class="orange text-sm font-black tracking-widest">
+          TRANSFORMATION ANALYTICS
+        </p>
+
+        <h1 class="text-4xl md:text-5xl font-black text-gray-900 mt-2">
+          YOUR PROGRESS
+        </h1>
+
+        <p class="text-gray-500 mt-3 max-w-2xl leading-relaxed">
+          Track your weight, activity, calories and weekly targets
+          so you can focus on consistent long-term progress.
+        </p>
+        <p class="text-sm font-black text-orange-600 mt-3">
+          {{ challenge_start.strftime('%d-%m-%Y') }} to {{ challenge_end.strftime('%d-%m-%Y') }} • {{ challenge_days }} days
+        </p>
+
+      </div>
+
+
+      <div class="flex flex-wrap gap-2">
+
+        <a
+          href="/workout"
+          class="bg-white border border-orange-100 rounded-xl px-4 py-2.5 text-sm font-bold text-gray-700 shadow-sm hover:bg-orange-50 transition"
+        >
+          🏋️ Workout
+        </a>
+
+        <a
+          href="/diet"
+          class="bg-white border border-orange-100 rounded-xl px-4 py-2.5 text-sm font-bold text-gray-700 shadow-sm hover:bg-orange-50 transition"
+        >
+          🥗 Diet
+        </a>
+
+        <a
+          href="/export/pdf"
+          class="bg-orange-500 text-white rounded-xl px-4 py-2.5 text-sm font-bold shadow-sm hover:bg-orange-600 transition"
+        >
+          📄 Export PDF
+        </a>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</header>
+
+
+<main class="max-w-7xl mx-auto px-4 py-8">
+
+
+<!-- =========================================================
+     METRIC CARDS
+========================================================= -->
+
+<section class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
+  <div class="card rounded-2xl p-5">
+    <p class="text-xs text-gray-400 font-black uppercase">
+      Starting Weight
+    </p>
+    <p class="metric-number orange mt-2">
+      {{ "%.1f"|format(profile.starting_weight_kg) }} kg
+    </p>
+    <p class="text-xs text-gray-400 mt-2">
+      Transformation starting point
+    </p>
+  </div>
+
+  <div class="card rounded-2xl p-5">
+    <p class="text-xs text-gray-400 font-black uppercase">
+      Target Weight
+    </p>
+    <p class="metric-number green mt-2">
+      {{ "%.1f"|format(profile.target_weight_kg) }} kg
+    </p>
+    <p class="text-xs text-gray-400 mt-2">
+      Your current goal
+    </p>
+  </div>
+
+  <div class="card rounded-2xl p-5">
+    <p class="text-xs text-gray-400 font-black uppercase">
+      Current Weight
+    </p>
+    <p class="metric-number blue mt-2">
+      {% if weights and weights[-1] %}
+        {{ "%.1f"|format(weights[-1]) }} kg
+      {% else %}
+        {{ "%.1f"|format(profile.starting_weight_kg) }} kg
+      {% endif %}
+    </p>
+    <p class="text-xs text-gray-400 mt-2">
+      Latest recorded weight
+    </p>
+  </div>
+
+  <div class="card rounded-2xl p-5">
+    <p class="text-xs text-gray-400 font-black uppercase">
+      Logged Days
+    </p>
+    <p class="metric-number purple mt-2">
+      {{ labels|length }}
+    </p>
+    <p class="text-xs text-gray-400 mt-2">
+      Days recorded in history
+    </p>
+  </div>
+
+</section>
+
+
+<!-- =========================================================
+     MAIN GRID
+========================================================= -->
+
+<section class="grid lg:grid-cols-5 gap-6 mt-7">
+
+
+  <!-- LEFT: CHARTS -->
+  <div class="lg:col-span-3 space-y-6">
+
+    <!-- WEIGHT CHART -->
+    <div class="card rounded-3xl overflow-hidden">
+
+      <div class="px-6 py-5 border-b border-gray-100 flex justify-between items-center">
+        <div>
+          <h2 class="font-black text-xl text-gray-900">
+            Weight Transformation
+          </h2>
+          <p class="text-xs text-gray-400 mt-1">
+            Actual weight vs reference target
+          </p>
+        </div>
+        <span class="rounded-full px-3 py-1 text-xs font-bold bg-orange-100 text-orange-700">
+          KG
+        </span>
+      </div>
+
+      <div class="chart-box">
+        <canvas id="weightChart"></canvas>
+      </div>
+
+    </div>
+
+
+    <!-- ACTIVITY SCORE -->
+    <div class="card rounded-3xl overflow-hidden">
+
+      <div class="px-6 py-5 border-b border-gray-100 flex flex-wrap justify-between items-center gap-3">
+        <div>
+          <h2 class="font-black text-xl text-gray-900">
+            Daily Consistency
+          </h2>
+          <p class="text-xs text-gray-400 mt-1">
+            Avg (<span id="scoreRangeLabel">All time</span>):
+            <b id="scoreAvgLabel" class="orange">–</b>
+          </p>
+        </div>
+        <div class="flex gap-1.5" id="scoreFilters">
+          <button type="button" data-range="7" class="score-filter-btn rounded-full px-3 py-1.5 text-xs font-bold bg-gray-100 text-gray-600">Week</button>
+          <button type="button" data-range="30" class="score-filter-btn rounded-full px-3 py-1.5 text-xs font-bold bg-gray-100 text-gray-600">Month</button>
+          <button type="button" data-range="all" class="score-filter-btn rounded-full px-3 py-1.5 text-xs font-bold bg-orange-500 text-white">All</button>
+        </div>
+      </div>
+
+      <div class="chart-box medium">
+        <canvas id="scoreChart"></canvas>
+      </div>
+
+    </div>
+
+
+    <!-- DAILY WEIGHT BAR CHART -->
+    <div class="card rounded-3xl overflow-hidden">
+
+      <div class="px-6 py-5 border-b border-gray-100">
+        <h2 class="font-black text-xl text-gray-900">
+          Daily Weight Monitor
+        </h2>
+        <p class="text-xs text-gray-400 mt-1">
+          Morning weight entered on the dashboard
+        </p>
+      </div>
+
+      <div class="chart-box medium">
+        <canvas id="weightBarChart"></canvas>
+      </div>
+
+    </div>
+
+
+    <!-- CALORIE CHART -->
+    <div class="card rounded-3xl overflow-hidden">
+
+      <div class="px-6 py-5 border-b border-gray-100 flex justify-between items-center">
+        <div>
+          <h2 class="font-black text-xl text-gray-900">
+            Calorie Tracking
+          </h2>
+          <p class="text-xs text-gray-400 mt-1">
+            Calories and macros recorded from your food log
+          </p>
+        </div>
+        <span class="rounded-full px-3 py-1 text-xs font-bold bg-purple-100 text-purple-700">
+          NUTRITION
+        </span>
+      </div>
+
+      <div class="chart-box medium">
+        <canvas id="calorieChart"></canvas>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- RIGHT COLUMN -->
+  <div class="lg:col-span-2 space-y-6">
+
+    <!-- GOAL PROGRESS -->
+    <div class="card rounded-3xl p-6">
+
+      <div class="flex justify-between items-center mb-5">
+        <div>
+          <h2 class="font-black text-xl text-gray-900">Nutrition By Meal</h2>
+          <p class="text-xs text-gray-400 mt-1">Planned calories and macros for the challenge</p>
+        </div>
+        <span class="rounded-full px-3 py-1 text-xs font-bold bg-green-100 text-green-700">PLAN</span>
+      </div>
+
+      <div class="space-y-3">
+        {% for meal, totals in diet_meal_totals.items() %}
+        <div class="border-b border-gray-100 pb-3">
+          <div class="flex justify-between items-center">
+            <span class="text-sm font-black text-gray-700">{{ meal }}</span>
+            <span class="text-sm font-black text-gray-900">{{ totals.calories }} kcal</span>
+          </div>
+          <p class="text-xs text-gray-500 mt-1">
+            {{ totals.protein }}g protein · {{ totals.carbs }}g carbs ·
+            {{ totals.fat }}g fat · {{ totals.fiber }}g fiber
+          </p>
+        </div>
+        {% endfor %}
+      </div>
+
+      <div class="mt-5 rounded-2xl border border-red-200 bg-red-50 p-4">
+        <div class="flex justify-between items-center">
+          <span class="text-sm font-black text-red-700">Added Food</span>
+          <span class="text-sm font-black text-red-700">{{ added_food_totals.calories }} kcal</span>
+        </div>
+        <p class="text-xs text-red-600 mt-1">
+          {{ added_food_totals.protein }}g protein · {{ added_food_totals.carbs }}g carbs ·
+          {{ added_food_totals.fat }}g fat · {{ added_food_totals.fiber }}g fiber
+        </p>
+      </div>
+
+    </div>
+
+
+    <!-- GOAL PROGRESS -->
+    <div class="card rounded-3xl p-6">
+
+      <div class="flex justify-between items-center mb-5">
+        <div>
+          <h2 class="font-black text-xl text-gray-900">
+            Goal Progress
+          </h2>
+          <p class="text-xs text-gray-400 mt-1">
+            Journey toward target weight
+          </p>
+        </div>
+        <span class="rounded-full px-3 py-1 text-xs font-bold bg-orange-100 text-orange-700">
+          GOAL
+        </span>
+      </div>
+
+      <div class="flex justify-between items-end mb-3">
+        <div>
+          <p class="text-xs text-gray-400 font-bold uppercase">Current</p>
+          <p class="text-3xl font-black text-gray-900 mt-1">
+            {% if weights and weights[-1] %}
+              {{ "%.1f"|format(weights[-1]) }}
+            {% else %}
+              {{ "%.1f"|format(profile.starting_weight_kg) }}
+            {% endif %}
+            <span class="text-sm font-bold text-gray-400">kg</span>
+          </p>
+        </div>
+        <div class="text-right">
+          <p class="text-xs text-gray-400">Target</p>
+          <p class="text-sm font-black text-gray-900">
+            {{ "%.1f"|format(profile.target_weight_kg) }} kg
+          </p>
+        </div>
+      </div>
+
+      <div class="progress-track">
+        <div class="progress-fill" id="goalProgress" style="width: 0%;"></div>
+      </div>
+
+      <div class="flex justify-between mt-2 text-xs text-gray-400">
+        <span>Starting: {{ "%.1f"|format(profile.starting_weight_kg) }} kg</span>
+        <span>Goal: {{ "%.1f"|format(profile.target_weight_kg) }} kg</span>
+      </div>
+
+    </div>
+
+
+    <!-- PROFILE -->
+    <div class="card rounded-3xl overflow-hidden">
+
+      <div class="px-6 py-5 border-b border-gray-100">
+        <h2 class="font-black text-xl text-gray-900">
+          Transformation Profile
+        </h2>
+        <p class="text-xs text-gray-400 mt-1">
+          Your current program settings
+        </p>
+      </div>
+
+      <div class="divide-y divide-gray-100">
+
+        <div class="px-6 py-3.5 flex justify-between items-center">
+          <span class="text-sm text-gray-500">Name</span>
+          <span class="text-sm font-black text-gray-900">{{ profile.name }}</span>
+        </div>
+
+        <div class="px-6 py-3.5 flex justify-between items-center">
+          <span class="text-sm text-gray-500">Age</span>
+          <span class="text-sm font-black text-gray-900">{{ profile.age }}</span>
+        </div>
+
+        <div class="px-6 py-3.5 flex justify-between items-center">
+          <span class="text-sm text-gray-500">Height</span>
+          <span class="text-sm font-black text-gray-900">{{ profile.height_cm }} cm</span>
+        </div>
+
+        <div class="px-6 py-3.5 flex justify-between items-center">
+          <span class="text-sm text-gray-500">Starting Weight</span>
+          <span class="text-sm font-black text-gray-900">{{ "%.1f"|format(profile.starting_weight_kg) }} kg</span>
+        </div>
+
+        <div class="px-6 py-3.5 flex justify-between items-center">
+          <span class="text-sm text-gray-500">Goal Weight</span>
+          <span class="text-sm font-black text-gray-900">{{ "%.1f"|format(profile.target_weight_kg) }} kg</span>
+        </div>
+
+        <div class="px-6 py-3.5 flex justify-between items-center">
+          <span class="text-sm text-gray-500">Daily Steps</span>
+          <span class="text-sm font-black text-gray-900">{{ "{:,}".format(profile.daily_step_target|int) }}</span>
+        </div>
+
+        <div class="px-6 py-3.5 flex justify-between items-center">
+          <span class="text-sm text-gray-500">Water Target</span>
+          <span class="text-sm font-black text-gray-900">{{ profile.water_target_l }} L</span>
+        </div>
+
+      </div>
+
+      <div class="p-5">
+        <div class="insight-box rounded-xl p-4">
+          <p class="text-xs font-black text-blue-600 mb-1">💡 Progress Insight</p>
+          <p class="text-xs text-gray-600 leading-relaxed">
+            Daily weight can change because of hydration, sodium,
+            glycogen and digestion. Focus on the overall direction
+            of your trend instead of reacting to a single measurement.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- WEEKLY TARGETS -->
+    <div class="card rounded-3xl overflow-hidden">
+
+      <div class="px-6 py-5 border-b border-gray-100 flex justify-between items-center">
+        <div>
+          <h2 class="font-black text-xl text-gray-900">
+            Weekly Targets
+          </h2>
+          <p class="text-xs text-gray-400 mt-1">
+            Planned weight trajectory
+          </p>
+        </div>
+        <span class="rounded-full px-3 py-1 text-xs font-bold bg-green-100 text-green-700">
+          PLAN
+        </span>
+      </div>
+
+      <div class="divide-y divide-gray-100 max-h-[420px] overflow-y-auto">
+
+        {% for target in weekly_targets[:12] %}
+        <div class="px-6 py-3 flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center text-xs font-black flex-shrink-0">
+            {{ loop.index }}
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-bold text-gray-900">Week {{ loop.index }}</p>
+            <p class="text-[10px] text-gray-400">Reference target</p>
+          </div>
+          <p class="text-sm font-black green whitespace-nowrap">
+            {{ "%.2f"|format(target) }} kg
+          </p>
+        </div>
+        {% endfor %}
+
+      </div>
+
+    </div>
+
+
+    <!-- QUICK METRICS -->
+    <div class="card rounded-3xl p-6">
+
+      <h2 class="font-black text-xl text-gray-900 mb-1">
+        Quick Metrics
+      </h2>
+      <p class="text-xs text-gray-400 mb-5">
+        Useful transformation numbers
+      </p>
+
+      <div class="grid grid-cols-2 gap-3">
+
+        <div class="bg-gray-50 border border-gray-100 rounded-xl p-4">
+          <p class="text-[10px] text-gray-400 font-black uppercase">Total Goal Diff</p>
+          <p class="text-xl font-black text-gray-900 mt-1">
+            {{ "%.1f"|format(profile.starting_weight_kg - profile.target_weight_kg) }}
+            <span class="text-xs text-gray-400">kg</span>
+          </p>
+        </div>
+
+        <div class="bg-gray-50 border border-gray-100 rounded-xl p-4">
+          <p class="text-[10px] text-gray-400 font-black uppercase">Daily Steps</p>
+          <p class="text-xl font-black text-gray-900 mt-1">
+            {{ "{:,}".format(profile.daily_step_target|int) }}
+          </p>
+        </div>
+
+        <div class="bg-gray-50 border border-gray-100 rounded-xl p-4">
+          <p class="text-[10px] text-gray-400 font-black uppercase">Water Goal</p>
+          <p class="text-xl font-black text-gray-900 mt-1">
+            {{ profile.water_target_l }}
+            <span class="text-xs text-gray-400">L</span>
+          </p>
+        </div>
+
+        <div class="bg-gray-50 border border-gray-100 rounded-xl p-4">
+          <p class="text-[10px] text-gray-400 font-black uppercase">Data Points</p>
+          <p class="text-xl font-black text-gray-900 mt-1">
+            {{ labels|length }}
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- =========================================================
+     FOOTER
+========================================================= -->
+
+<footer class="text-center py-8">
+  <p class="text-xs text-gray-400">
+    PEAK TRANSFORMATION • PROGRESS ANALYTICS • STAY CONSISTENT AND TRUST THE TREND
+  </p>
+</footer>
+
+</main>
+
+
+<script>
+  const labels = {{ labels | tojson }};
+  const weights = {{ weights | tojson }};
+  const scores = {{ scores | tojson }};
+  const calories = {{ calories | tojson }};
+  const protein = {{ protein | tojson }};
+  const carbs = {{ carbs | tojson }};
+  const fat = {{ fat | tojson }};
+  const fiber = {{ fiber | tojson }};
+  const targets = {{ targets | tojson }};
+
+  /* Goal progress bar */
+  const startingWeight = Number({{ profile.starting_weight_kg | default(0) | tojson }});
+  const targetWeight = Number({{ profile.target_weight_kg | default(0) | tojson }});
+  const currentWeight =
+    weights && weights.length && weights[weights.length - 1] != null
+      ? Number(weights[weights.length - 1])
+      : startingWeight;
+
+  let goalPercent = 0;
+  if (startingWeight !== targetWeight && Number.isFinite(currentWeight)) {
+    goalPercent =
+      ((startingWeight - currentWeight) / (startingWeight - targetWeight)) * 100;
+  }
+  goalPercent = Math.max(0, Math.min(100, goalPercent));
+
+  const goalProgress = document.getElementById("goalProgress");
+  if (goalProgress) {
+    goalProgress.style.width = goalPercent.toFixed(1) + "%";
+  }
+
+  /* Chart defaults */
+  Chart.defaults.font.family = "'DM Sans', system-ui, sans-serif";
+  Chart.defaults.color = "#64748b";
+
+  const commonOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: "index", intersect: false },
+    plugins: {
+      legend: {
+        position: "bottom",
+        labels: {
+          usePointStyle: true,
+          pointStyle: "circle",
+          padding: 16,
+          boxWidth: 8,
+          color: "#64748b",
+          font: { size: 11, weight: "700" }
+        }
+      },
+      tooltip: {
+        backgroundColor: "#172033",
+        titleColor: "#ffffff",
+        bodyColor: "#e2e8f0",
+        padding: 12,
+        cornerRadius: 10,
+        displayColors: true
+      }
+    },
+    scales: {
+      x: {
+        grid: { display: false },
+        ticks: {
+          color: "#94a3b8",
+          maxTicksLimit: 10,
+          font: { size: 10, weight: "600" }
+        }
+      },
+      y: {
+        grid: { color: "rgba(15, 23, 42, .06)" },
+        ticks: {
+          color: "#94a3b8",
+          font: { size: 10, weight: "600" }
+        }
+      }
+    }
+  };
+
+  /* Weight chart */
+  const weightCanvas = document.getElementById("weightChart");
+  if (weightCanvas) {
+    new Chart(weightCanvas, {
+      type: "line",
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: "Actual Weight",
+            data: weights,
+            borderColor: "#ea580c",
+            backgroundColor: "rgba(234, 88, 12, .10)",
+            borderWidth: 3,
+            pointRadius: 4,
+            pointHoverRadius: 7,
+            pointBackgroundColor: "#ea580c",
+            pointBorderColor: "#ffffff",
+            pointBorderWidth: 2,
+            fill: true,
+            tension: 0.38,
+            spanGaps: true
+          },
+          {
+            label: "Reference Target",
+            data: targets,
+            borderColor: "#2563eb",
+            borderDash: [8, 6],
+            borderWidth: 2.5,
+            pointRadius: 0,
+            pointHoverRadius: 4,
+            tension: 0.38,
+            fill: false
+          }
+        ]
+      },
+      options: {
+        ...commonOptions,
+        plugins: {
+          ...commonOptions.plugins,
+          tooltip: {
+            ...commonOptions.plugins.tooltip,
+            callbacks: {
+              label: function (context) {
+                return " " + context.dataset.label + ": " + context.parsed.y + " kg";
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  /* Daily weight monitor (bar) */
+  const weightBarCanvas = document.getElementById("weightBarChart");
+  if (weightBarCanvas) {
+    new Chart(weightBarCanvas, {
+      type: "bar",
+      data: {
+        labels: labels,
+        datasets: [{
+          label: "Morning Weight",
+          data: weights,
+          backgroundColor: "rgba(234, 88, 12, .72)",
+          hoverBackgroundColor: "#ea580c",
+          borderColor: "#ea580c",
+          borderWidth: 1,
+          borderRadius: 5,
+          borderSkipped: false
+        }]
+      },
+      options: {
+        ...commonOptions,
+        scales: {
+          ...commonOptions.scales,
+          y: {
+            ...commonOptions.scales.y,
+            title: { display: true, text: "kg" }
+          }
+        }
+      }
+    });
+  }
+
+  /* Score chart with range filtering */
+  const scoreCanvas = document.getElementById("scoreChart");
+  let scoreChartInstance = null;
+  if (scoreCanvas) {
+    scoreChartInstance = new Chart(scoreCanvas, {
+      type: "bar",
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: "Activity Score",
+            data: scores,
+            backgroundColor: "rgba(37, 99, 235, .72)",
+            hoverBackgroundColor: "#2563eb",
+            borderColor: "#2563eb",
+            borderWidth: 1,
+            borderRadius: 6,
+            borderSkipped: false
+          }
+        ]
+      },
+      options: {
+        ...commonOptions,
+        scales: {
+          ...commonOptions.scales,
+          y: {
+            ...commonOptions.scales.y,
+            min: 0,
+            max: 100,
+            ticks: {
+              ...commonOptions.scales.y.ticks,
+              stepSize: 20
+            }
+          }
+        }
+      }
+    });
+  }
+
+  function applyScoreRange(range) {
+    let l = labels, s = scores, rangeLabel = "All time";
+    if (range !== "all") {
+      const n = parseInt(range, 10);
+      l = labels.slice(-n);
+      s = scores.slice(-n);
+      rangeLabel = n === 7 ? "This week" : "This month";
+    }
+    if (scoreChartInstance) {
+      scoreChartInstance.data.labels = l;
+      scoreChartInstance.data.datasets[0].data = s;
+      scoreChartInstance.update();
+    }
+    const avg = s.length ? Math.round(s.reduce((a, b) => a + b, 0) / s.length) : 0;
+    document.getElementById("scoreAvgLabel").textContent = avg + "%";
+    document.getElementById("scoreRangeLabel").textContent = rangeLabel;
+  }
+
+  document.querySelectorAll(".score-filter-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".score-filter-btn").forEach(b => {
+        b.classList.remove("bg-orange-500", "text-white");
+        b.classList.add("bg-gray-100", "text-gray-600");
+      });
+      btn.classList.remove("bg-gray-100", "text-gray-600");
+      btn.classList.add("bg-orange-500", "text-white");
+      applyScoreRange(btn.dataset.range);
+    });
+  });
+  applyScoreRange("all");
+
+  /* Calorie chart (bar) */
+  const calorieCanvas = document.getElementById("calorieChart");
+  if (calorieCanvas) {
+    new Chart(calorieCanvas, {
+      type: "bar",
+      data: {
+        labels: labels,
+        datasets: [
+          { label: "Calories", data: calories, backgroundColor: "rgba(147, 51, 234, .72)", borderColor: "#9333ea", borderWidth: 1, borderRadius: 6, borderSkipped: false },
+          { label: "Protein (g)", data: protein, backgroundColor: "rgba(22, 163, 74, .72)", borderColor: "#16a34a", borderWidth: 1, borderRadius: 6, borderSkipped: false },
+          { label: "Carbs (g)", data: carbs, backgroundColor: "rgba(37, 99, 235, .72)", borderColor: "#2563eb", borderWidth: 1, borderRadius: 6, borderSkipped: false },
+          { label: "Fat (g)", data: fat, backgroundColor: "rgba(234, 88, 12, .72)", borderColor: "#ea580c", borderWidth: 1, borderRadius: 6, borderSkipped: false },
+          { label: "Fiber (g)", data: fiber, backgroundColor: "rgba(8, 145, 178, .72)", borderColor: "#0891b2", borderWidth: 1, borderRadius: 6, borderSkipped: false }
+        ]
+      },
+      options: commonOptions
+    });
+  }
+</script>
+
+</body>
+</html>

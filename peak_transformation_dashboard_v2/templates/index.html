@@ -1,0 +1,910 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+  <title>Dashboard | Peak Transformation</title>
+
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800;900&display=swap"
+    rel="stylesheet"
+  >
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'DM Sans', sans-serif;
+      background:
+        radial-gradient(
+          circle at 5% 0%,
+          rgba(249, 115, 22, .10),
+          transparent 25%
+        ),
+        radial-gradient(
+          circle at 95% 15%,
+          rgba(34, 197, 94, .08),
+          transparent 25%
+        ),
+        #f5f7fb;
+      color: #172033;
+    }
+
+    .nav {
+      background: rgba(255,255,255,.96);
+      border-bottom: 1px solid #e5e7eb;
+      backdrop-filter: blur(12px);
+    }
+
+    .nav a {
+      color: #64748b;
+      transition: all .2s ease;
+    }
+
+    .nav a:hover,
+    .nav a.active {
+      color: #ea580c;
+      background: #fff7ed;
+    }
+
+    .hero {
+      background:
+        radial-gradient(
+          circle at 90% 10%,
+          rgba(249,115,22,.12),
+          transparent 30%
+        ),
+        linear-gradient(
+          135deg,
+          #ffffff 0%,
+          #fffaf5 55%,
+          #f8fafc 100%
+        );
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .card {
+      background: rgba(255,255,255,.97);
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 10px 35px rgba(15,23,42,.07);
+      transition: all .25s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 18px 45px rgba(15,23,42,.12);
+    }
+
+    .orange {
+      color: #ea580c;
+    }
+
+    .green {
+      color: #16a34a;
+    }
+
+    .blue {
+      color: #2563eb;
+    }
+
+    .purple {
+      color: #9333ea;
+    }
+
+    .metric-number {
+      font-size: 30px;
+      line-height: 1.1;
+      font-weight: 900;
+    }
+
+    .workout-image-wrap {
+      height: 240px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .workout-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform .55s ease;
+    }
+
+    .card:hover .workout-image {
+      transform: scale(1.06);
+    }
+
+    .image-overlay {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(
+          to top,
+          rgba(0,0,0,.72),
+          rgba(0,0,0,.08) 65%,
+          transparent
+        );
+    }
+
+    .day-title {
+      position: absolute;
+      left: 22px;
+      bottom: 18px;
+      color: white;
+      font-size: 25px;
+      line-height: 1;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      text-shadow: 0 2px 8px rgba(0,0,0,.4);
+    }
+
+    .day-subtitle {
+      position: absolute;
+      left: 22px;
+      bottom: 47px;
+      color: #fed7aa;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .exercise-row {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      transition: all .2s ease;
+    }
+
+    .exercise-row:hover {
+      background: #fff7ed;
+      border-color: #fed7aa;
+      transform: translateX(2px);
+    }
+
+    .activity-item {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      transition: all .2s ease;
+      cursor: pointer;
+    }
+
+    .activity-item:hover {
+      background: #fff7ed;
+      border-color: #fed7aa;
+    }
+
+    .activity-item.checked {
+      background: #fff7ed;
+      border-color: #fed7aa;
+    }
+
+    .rule-box {
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+    }
+
+    .note-box {
+      background: linear-gradient(135deg,#fffbeb,#fff);
+      border: 1px solid #fde68a;
+    }
+
+    .progress-track {
+      height: 9px;
+      background: #e5e7eb;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #f97316, #fb923c);
+      border-radius: 999px;
+      transition: width .4s ease;
+    }
+
+    input[type="number"],
+    input[type="text"],
+    textarea {
+      width: 100%;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      background: #f8fafc;
+      padding: 12px 14px;
+      font-size: 14px;
+      font-family: inherit;
+      color: #172033;
+      outline: none;
+      transition: .2s;
+    }
+
+    input:focus,
+    textarea:focus {
+      background: white;
+      border-color: #fb923c;
+      box-shadow: 0 0 0 3px rgba(249, 115, 22, .12);
+    }
+
+    .save-btn {
+      width: 100%;
+      margin-top: 14px;
+      border: 0;
+      border-radius: 12px;
+      height: 48px;
+      background: linear-gradient(135deg, #f97316, #ea580c);
+      color: white;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(234, 88, 12, .25);
+      transition: .2s;
+    }
+
+    .save-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 24px rgba(234, 88, 12, .32);
+    }
+
+    .save-status {
+      display: none;
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: #f0fdf4;
+      color: #16a34a;
+      font-size: 13px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    @media (max-width: 700px) {
+      .workout-image-wrap {
+        height: 210px;
+      }
+
+      .day-title {
+        font-size: 22px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- =========================================================
+     NAVIGATION
+========================================================= -->
+
+<nav class="nav sticky top-0 z-50">
+
+  <div class="max-w-7xl mx-auto px-4 py-3">
+
+    <div class="flex gap-2 overflow-x-auto">
+
+      <a
+        href="/"
+        class="active rounded-xl px-4 py-2 whitespace-nowrap"
+      >
+        📊 Dashboard
+      </a>
+
+      <a
+        href="/workout"
+        class="rounded-xl px-4 py-2 whitespace-nowrap"
+      >
+        🏋️ Workout
+      </a>
+
+      <a
+        href="/diet"
+        class="rounded-xl px-4 py-2 whitespace-nowrap"
+      >
+        🥗 Diet
+      </a>
+
+      <a
+        href="/progress"
+        class="rounded-xl px-4 py-2 whitespace-nowrap"
+      >
+        📈 Progress
+      </a>
+
+    </div>
+
+  </div>
+
+</nav>
+
+
+<!-- =========================================================
+     HERO
+========================================================= -->
+
+<header class="hero">
+
+  <div class="max-w-7xl mx-auto px-4 py-10">
+
+    <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-7">
+
+      <div>
+
+        <div class="flex items-center gap-4 mb-4">
+          <img src="{{ url_for('static', filename='images/profile.png') }}" alt="{{ profile.name }}" class="w-16 h-16 rounded-2xl object-cover border-4 border-white shadow-md">
+          <div>
+            <p class="text-xs text-gray-400 font-black tracking-widest">{{ profile.name }}</p>
+            <p class="text-sm font-bold text-gray-700">{{ challenge_days }}-day transformation challenge</p>
+          </div>
+        </div>
+
+        <p class="orange text-sm font-black tracking-widest">
+          LEAN MUSCLE • FAT LOSS
+        </p>
+
+        <h1 class="text-4xl md:text-5xl font-black text-gray-900 mt-2">
+          PEAK TRANSFORMATION
+        </h1>
+
+        <p class="text-gray-500 mt-3 max-w-2xl leading-relaxed">
+          Build a leaner and stronger physique with progressive overload,
+          consistent nutrition, daily activity and enough recovery.
+        </p>
+
+      </div>
+
+
+      <div class="bg-white border border-orange-100 rounded-2xl p-5 shadow-sm min-w-[230px]">
+
+        <p class="text-xs text-gray-400 font-black tracking-wider">
+          TODAY
+        </p>
+
+        <p class="text-2xl font-black orange mt-1">
+          {{ weekday }}
+        </p>
+
+        <p class="text-xs text-gray-500 mt-1">
+          {{ challenge_start.strftime('%d-%m-%Y') }} to {{ challenge_end.strftime('%d-%m-%Y') }}
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</header>
+
+
+<main class="max-w-7xl mx-auto px-4 py-8">
+
+
+<!-- =========================================================
+     METRIC CARDS
+========================================================= -->
+
+<section class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
+  <div class="card rounded-2xl p-5">
+    <p class="text-xs text-gray-400 font-black uppercase">
+      Current Weight
+    </p>
+    <p class="metric-number orange mt-2">
+      {{ "%.1f"|format(current_weight) }} kg
+    </p>
+    <p class="text-xs text-gray-400 mt-2">
+      Starting: {{ "%.1f"|format(profile.starting_weight_kg) }} kg
+    </p>
+  </div>
+
+  <div class="card rounded-2xl p-5">
+    <p class="text-xs text-gray-400 font-black uppercase">
+      Target Weight
+    </p>
+    <p class="metric-number green mt-2">
+      {{ "%.1f"|format(profile.target_weight_kg) }} kg
+    </p>
+    <p class="text-xs text-gray-400 mt-2">
+      {{ "%.1f"|format(total_loss) }} kg lost so far
+    </p>
+  </div>
+
+  <div class="card rounded-2xl p-5">
+    <p class="text-xs text-gray-400 font-black uppercase">
+      Calories Consumed
+    </p>
+    <p class="metric-number blue mt-2">
+      {{ "%.0f"|format(consumed_calories) }}
+    </p>
+    <p class="text-xs text-gray-400 mt-2">
+      Today's food log • Target {{ target_calories }} kcal
+    </p>
+  </div>
+
+  <div class="card rounded-2xl p-5">
+    <p class="text-xs text-gray-400 font-black uppercase">
+      Weekly Loss
+    </p>
+    <p class="metric-number purple mt-2">
+      {{ "%.2f"|format(weekly_loss) }} kg
+    </p>
+    <p class="text-xs text-gray-400 mt-2">
+      Estimated at current target
+    </p>
+  </div>
+
+</section>
+
+
+<!-- =========================================================
+     STREAK CARD
+========================================================= -->
+
+<div class="card rounded-2xl p-5 mt-4 flex items-center justify-between">
+  <div>
+    <p class="text-xs text-gray-400 font-black uppercase">Current Streak</p>
+    <p class="metric-number orange mt-1">{{ streak }} 🔥</p>
+    <p class="text-xs text-gray-400 mt-1">Consecutive days ≥70% consistency</p>
+  </div>
+</div>
+
+
+<!-- =========================================================
+     MAIN GRID
+========================================================= -->
+
+<section class="grid lg:grid-cols-5 gap-6 mt-7">
+
+
+  <!-- LEFT: TODAY'S WORKOUT -->
+  <div class="lg:col-span-3 space-y-6">
+
+    <article class="card rounded-3xl overflow-hidden">
+
+      <div class="workout-image-wrap">
+        <img
+          src="{{ workout_image }}"
+          alt="{{ weekday }} workout"
+          class="workout-image"
+          loading="lazy"
+          onerror="this.src='https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1400&q=90'"
+        >
+        <div class="image-overlay"></div>
+        <div class="day-subtitle">TODAY'S TRAINING</div>
+        <div class="day-title">{{ weekday }}</div>
+      </div>
+
+      <div class="p-6">
+
+        <div class="flex justify-between items-center mb-5">
+          <div>
+            <h2 class="font-black text-2xl text-gray-900">
+              Today's Workout
+            </h2>
+            <p class="text-xs text-gray-400 mt-1">
+              Complete each exercise with controlled technique.
+            </p>
+          </div>
+          <a
+            href="/workout"
+            class="rounded-full px-3 py-1.5 text-xs font-bold bg-orange-100 text-orange-700"
+          >
+            FULL PLAN →
+          </a>
+        </div>
+
+        <div class="space-y-2">
+          {% for exercise, reps in workout %}
+          <div class="exercise-row rounded-xl px-4 py-3 flex justify-between items-center">
+            <span class="text-sm text-gray-700 font-medium">
+              {{ exercise }}
+            </span>
+            <b class="orange text-sm whitespace-nowrap ml-3">
+              {{ reps }}
+            </b>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="mt-5 bg-orange-50 border border-orange-100 rounded-xl p-4">
+          <p class="text-sm text-gray-600">
+            <b class="orange">Training tip:</b>
+            Focus on controlled eccentric reps, good range of motion,
+            stable technique and progressive overload.
+          </p>
+        </div>
+
+      </div>
+
+    </article>
+
+
+    <!-- DAILY HABITS -->
+    <section class="card rounded-3xl p-6">
+
+      <div class="flex justify-between items-center mb-5">
+        <div>
+          <h2 class="font-black text-xl text-gray-900">
+            Daily Habits
+          </h2>
+          <p class="text-xs text-gray-400 mt-1">
+            Complete your daily transformation checklist
+          </p>
+        </div>
+        <span class="rounded-full px-3 py-1 text-xs font-bold bg-orange-100 text-orange-700">
+          {{ today }}
+        </span>
+      </div>
+
+      <div class="grid sm:grid-cols-2 gap-2">
+        {% for key, label in activities %}
+        <label class="activity-item rounded-xl px-4 py-3 flex items-center gap-3
+          {% if log.get(key, 0) %}checked{% endif %}">
+          <input
+            type="checkbox"
+            name="{{ key }}"
+            form="dailyLogForm"
+            value="1"
+            class="w-4 h-4 accent-orange-500 cursor-pointer"
+            {% if log.get(key, 0) %}checked{% endif %}
+          >
+          <span class="text-sm font-medium text-gray-700">
+            {{ label }}
+          </span>
+        </label>
+        {% endfor %}
+      </div>
+
+    </section>
+
+  </div>
+
+
+  <!-- RIGHT COLUMN -->
+  <div class="lg:col-span-2 space-y-6">
+
+    <!-- TODAY'S LOG -->
+    <section class="card rounded-3xl p-6">
+
+      <div class="flex justify-between items-center mb-5">
+        <div>
+          <h2 class="font-black text-xl text-gray-900">
+            Today's Log
+          </h2>
+          <p class="text-xs text-gray-400 mt-1">
+            Record weight, steps and calories
+          </p>
+        </div>
+        <span class="rounded-full px-3 py-1 text-xs font-bold bg-orange-100 text-orange-700">
+          {{ today }}
+        </span>
+      </div>
+
+      <form id="dailyLogForm">
+
+        <input type="hidden" name="log_date" value="{{ today }}">
+
+        <div class="grid grid-cols-2 gap-3">
+
+          <div>
+            <label class="block text-xs font-black text-gray-400 uppercase tracking-wider mb-2">
+              Weight (kg)
+            </label>
+            <input
+              id="weight"
+              type="number"
+              name="weight_kg"
+              step="0.01"
+              min="30"
+              max="250"
+              value="{{ log.get('weight_kg', current_weight) }}"
+              placeholder="76.00"
+            >
+          </div>
+
+          <div>
+            <label class="block text-xs font-black text-gray-400 uppercase tracking-wider mb-2">
+              Calories
+            </label>
+            <input
+              id="calories"
+              type="number"
+              name="calories"
+              min="0"
+              max="10000"
+              value="{{ log.get('calories', target_calories) }}"
+              placeholder="{{ target_calories }}"
+            >
+          </div>
+
+          <div class="col-span-2">
+            <label class="block text-xs font-black text-gray-400 uppercase tracking-wider mb-2">
+              Steps
+            </label>
+            <input
+              id="steps"
+              type="number"
+              name="steps"
+              min="0"
+              max="100000"
+              value="{{ log.get('steps', 0) }}"
+              placeholder="9000"
+            >
+          </div>
+
+          <div class="col-span-2">
+            <label class="block text-xs font-black text-gray-400 uppercase tracking-wider mb-2">
+              Notes
+            </label>
+            <textarea
+              id="notes"
+              name="notes"
+              rows="3"
+              placeholder="How did today's training, diet or recovery feel?"
+            >{{ log.get('notes', '') }}</textarea>
+          </div>
+
+        </div>
+
+        <button type="submit" class="save-btn">
+          Save Today's Progress
+        </button>
+
+        <div id="saveStatus" class="save-status">
+          ✓ Progress saved successfully
+        </div>
+
+      </form>
+
+    </section>
+
+
+    <!-- TARGETS -->
+    <section class="card rounded-3xl overflow-hidden">
+
+      <div class="px-6 py-5 border-b border-gray-100">
+        <h2 class="font-black text-xl text-gray-900">
+          Your Targets
+        </h2>
+        <p class="text-xs text-gray-400 mt-1">
+          Current transformation targets
+        </p>
+      </div>
+
+      <div class="divide-y divide-gray-100">
+
+        <div class="px-6 py-3.5 flex justify-between items-center">
+          <span class="text-sm text-gray-500">Starting weight</span>
+          <span class="text-sm font-black text-gray-900">
+            {{ "%.1f"|format(profile.starting_weight_kg) }} kg
+          </span>
+        </div>
+
+        <div class="px-6 py-3.5 flex justify-between items-center">
+          <span class="text-sm text-gray-500">Current weight</span>
+          <span class="text-sm font-black text-gray-900">
+            {{ "%.1f"|format(current_weight) }} kg
+          </span>
+        </div>
+
+        <div class="px-6 py-3.5 flex justify-between items-center">
+          <span class="text-sm text-gray-500">Goal weight</span>
+          <span class="text-sm font-black text-gray-900">
+            {{ "%.1f"|format(profile.target_weight_kg) }} kg
+          </span>
+        </div>
+
+        <div class="px-6 py-3.5 flex justify-between items-center">
+          <span class="text-sm text-gray-500">Daily steps</span>
+          <span class="text-sm font-black text-gray-900">
+            {{ "{:,}".format(profile.daily_step_target) }}
+          </span>
+        </div>
+
+        <div class="px-6 py-3.5 flex justify-between items-center">
+          <span class="text-sm text-gray-500">Water target</span>
+          <span class="text-sm font-black text-gray-900">
+            {{ "%.1f"|format(profile.water_target_l) }} L
+          </span>
+        </div>
+
+        <div class="px-6 py-3.5 flex justify-between items-center">
+          <span class="text-sm text-gray-500">Daily calories</span>
+          <span class="text-sm font-black text-gray-900">
+            {{ target_calories }} kcal
+          </span>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- CONSISTENCY SCORE -->
+    <section class="card rounded-3xl p-6">
+
+      <div class="flex justify-between items-center mb-4">
+        <div>
+          <h2 class="font-black text-xl text-gray-900">
+            Today's Consistency
+          </h2>
+          <p class="text-xs text-gray-400 mt-1">
+            Complete habits to improve your score
+          </p>
+        </div>
+        <span class="rounded-full px-3 py-1 text-xs font-bold bg-orange-100 text-orange-700">
+          {{ score }}%
+        </span>
+      </div>
+
+      <div class="flex justify-between items-center mb-2">
+        <span class="text-sm font-medium text-gray-600">Daily activity score</span>
+        <span class="text-sm font-black orange">{{ score }}%</span>
+      </div>
+
+      <div class="progress-track">
+        <div class="progress-fill" style="width: {{ score }}%;"></div>
+      </div>
+
+      <div class="grid grid-cols-3 gap-3 mt-5">
+
+        <div class="bg-gray-50 border border-gray-100 rounded-xl p-3 text-center">
+          <p class="text-lg font-black text-gray-900">{{ score }}%</p>
+          <p class="text-[10px] text-gray-400 font-bold uppercase mt-0.5">Today</p>
+        </div>
+
+        <div class="bg-gray-50 border border-gray-100 rounded-xl p-3 text-center">
+          <p class="text-lg font-black text-gray-900">{{ avg_score }}%</p>
+          <p class="text-[10px] text-gray-400 font-bold uppercase mt-0.5">Average</p>
+        </div>
+
+        <div class="bg-gray-50 border border-gray-100 rounded-xl p-3 text-center">
+          <p class="text-lg font-black text-gray-900">{{ "%.1f"|format(current_weight) }}</p>
+          <p class="text-[10px] text-gray-400 font-bold uppercase mt-0.5">Weight kg</p>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- QUICK ACCESS -->
+    <section class="card rounded-3xl p-6">
+
+      <h2 class="font-black text-xl text-gray-900 mb-1">
+        Quick Access
+      </h2>
+      <p class="text-xs text-gray-400 mb-5">
+        Manage your transformation
+      </p>
+
+      <div class="grid grid-cols-3 gap-3">
+
+        <a href="/workout" class="bg-gray-50 border border-gray-100 rounded-xl p-4 text-center hover:bg-orange-50 hover:border-orange-200 transition">
+          <div class="text-2xl">🏋️</div>
+          <div class="text-xs font-black text-gray-900 mt-2">Workout</div>
+          <div class="text-[10px] text-gray-400 mt-0.5">Full plan</div>
+        </a>
+
+        <a href="/diet" class="bg-gray-50 border border-gray-100 rounded-xl p-4 text-center hover:bg-orange-50 hover:border-orange-200 transition">
+          <div class="text-2xl">🥗</div>
+          <div class="text-xs font-black text-gray-900 mt-2">Nutrition</div>
+          <div class="text-[10px] text-gray-400 mt-0.5">Meal plan</div>
+        </a>
+
+        <a href="/progress" class="bg-gray-50 border border-gray-100 rounded-xl p-4 text-center hover:bg-orange-50 hover:border-orange-200 transition">
+          <div class="text-2xl">📊</div>
+          <div class="text-xs font-black text-gray-900 mt-2">Progress</div>
+          <div class="text-[10px] text-gray-400 mt-0.5">Analytics</div>
+        </a>
+
+      </div>
+
+    </section>
+
+  </div>
+
+</section>
+
+
+<!-- =========================================================
+     FOOTER
+========================================================= -->
+
+<footer class="text-center py-8">
+  <p class="text-xs text-gray-400">
+    PEAK TRANSFORMATION • STAY CONSISTENT • BUILD STRENGTH • RECOVER WELL
+  </p>
+</footer>
+
+</main>
+
+
+<script>
+  const form = document.getElementById("dailyLogForm");
+  const statusBox = document.getElementById("saveStatus");
+
+  document.querySelectorAll(".activity-item input").forEach(function (checkbox) {
+    checkbox.addEventListener("change", function () {
+      const parent = checkbox.closest(".activity-item");
+      if (checkbox.checked) {
+        parent.classList.add("checked");
+      } else {
+        parent.classList.remove("checked");
+      }
+    });
+  });
+
+  form.addEventListener("submit", async function (event) {
+    event.preventDefault();
+
+    const button = form.querySelector(".save-btn");
+    const formData = new FormData(form);
+    const payload = {};
+
+    formData.forEach(function (value, key) {
+      if (key === "log_date") {
+        payload[key] = value;
+        return;
+      }
+      if (key === "weight_kg" || key === "calories" || key === "steps" || key === "notes") {
+        payload[key] = value;
+        return;
+      }
+      payload[key] = value;
+    });
+
+    document.querySelectorAll(".activity-item input").forEach(function (checkbox) {
+      payload[checkbox.name] = checkbox.checked;
+    });
+
+    button.disabled = true;
+    button.textContent = "Saving...";
+
+    try {
+      const response = await fetch("/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.ok) {
+        throw new Error("Unable to save progress");
+      }
+
+      statusBox.style.display = "block";
+      statusBox.style.background = "#f0fdf4";
+      statusBox.style.color = "#16a34a";
+      statusBox.textContent = "✓ Progress saved successfully";
+
+      setTimeout(function () {
+        statusBox.style.display = "none";
+      }, 3000);
+
+      setTimeout(function () {
+        window.location.reload();
+      }, 900);
+
+    } catch (error) {
+      console.error(error);
+      statusBox.style.display = "block";
+      statusBox.style.background = "#fff0f0";
+      statusBox.style.color = "#dc2626";
+      statusBox.textContent = "✕ Could not save. Please try again.";
+    } finally {
+      button.disabled = false;
+      button.textContent = "Save Today's Progress";
+    }
+  });
+</script>
+
+</body>
+</html>
